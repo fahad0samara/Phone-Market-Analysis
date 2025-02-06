@@ -65,9 +65,9 @@ def load_phone_data():
     """Load and preprocess phone data"""
     df = pd.read_sql('SELECT * FROM mobile_phones', engine)
     
-    # Convert columns to numeric, removing any units
-    df['storage'] = pd.to_numeric(df['storage'].astype(str).str.extract('(\d+)')[0], errors='coerce')
-    df['ram'] = pd.to_numeric(df['ram'].astype(str).str.extract('(\d+)')[0], errors='coerce')
+    # Convert storage and RAM to numeric values
+    df['storage'] = pd.to_numeric(df['storage'].astype(str).str.extract(r'(\d+)')[0], errors='coerce')
+    df['ram'] = pd.to_numeric(df['ram'].astype(str).str.extract(r'(\d+)')[0], errors='coerce')
     df['price'] = pd.to_numeric(df['price'], errors='coerce')
     df['ratings'] = pd.to_numeric(df['ratings'], errors='coerce')
     
