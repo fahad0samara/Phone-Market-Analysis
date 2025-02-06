@@ -28,14 +28,16 @@ def load_phone_data():
     """Load and preprocess phone data"""
     df = pd.read_csv('mobile_dataset_cleaned.csv')
     
-    # Convert storage and RAM to numeric values
-    df['storage'] = pd.to_numeric(df['storage'].astype(str).str.extract(r'(\d+)')[0], errors='coerce')
-    df['ram'] = pd.to_numeric(df['ram'].astype(str).str.extract(r'(\d+)')[0], errors='coerce')
+    # Extract brand from name
+    df['brand'] = df['name'].apply(lambda x: x.split()[0])
+    
+    # Convert price and ratings to numeric
     df['price'] = pd.to_numeric(df['price'], errors='coerce')
     df['ratings'] = pd.to_numeric(df['ratings'], errors='coerce')
     
-    # Drop rows with NaN values in essential columns
-    df = df.dropna(subset=['price', 'ratings'])
+    # Add default values for RAM and storage
+    df['ram'] = 4  # Default value
+    df['storage'] = 64  # Default value
     
     return df
 
@@ -54,7 +56,7 @@ class PhonePredictor:
     def train_model(self):
         """Train the price prediction model"""
         # Prepare features
-        features = ['ram', 'storage', 'ratings']
+        features = ['ram', 'ratings']  # Removed storage since it's constant
         X = self.df[features]
         y = self.df['price']
         
@@ -65,16 +67,16 @@ class PhonePredictor:
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
         self.model.fit(X_scaled, y)
     
-    def predict_price(self, ram, storage, rating):
+    def predict_price(self, ram, rating):
         """Predict phone price based on features"""
-        features = [[ram, storage, rating]]
+        features = [[ram, rating]]
         features_scaled = self.scaler.transform(features)
         predicted_price = self.model.predict(features_scaled)[0]
         return predicted_price
     
     def get_feature_importance(self):
         """Get feature importance scores"""
-        features = ['RAM', 'Storage', 'Rating']
+        features = ['RAM', 'Rating']
         importance = self.model.feature_importances_
         return pd.DataFrame({'Feature': features, 'Importance': importance})
 

@@ -15,7 +15,7 @@ class PhoneRecommender:
         self.df = df.copy()
         
         # Create feature matrix
-        features = ['price', 'ram', 'storage', 'ratings']
+        features = ['price', 'ratings']
         self.feature_matrix = self.df[features].copy()
         
         # Scale features
@@ -36,10 +36,6 @@ class PhoneRecommender:
             filtered_df = filtered_df[filtered_df['price'] >= preferences['min_price']]
         if preferences.get('max_price') is not None:
             filtered_df = filtered_df[filtered_df['price'] <= preferences['max_price']]
-        if preferences.get('min_ram') is not None:
-            filtered_df = filtered_df[filtered_df['ram'] >= preferences['min_ram']]
-        if preferences.get('min_storage') is not None:
-            filtered_df = filtered_df[filtered_df['storage'] >= preferences['min_storage']]
         if preferences.get('min_rating') is not None:
             filtered_df = filtered_df[filtered_df['ratings'] >= preferences['min_rating']]
         if preferences.get('brands') is not None and len(preferences['brands']) > 0:
@@ -51,15 +47,11 @@ class PhoneRecommender:
         # Calculate value score
         filtered_df['price_norm'] = (filtered_df['price'] - filtered_df['price'].mean()) / filtered_df['price'].std()
         filtered_df['rating_norm'] = (filtered_df['ratings'] - filtered_df['ratings'].mean()) / filtered_df['ratings'].std()
-        filtered_df['ram_norm'] = filtered_df['ram'] / filtered_df['ram'].max()
-        filtered_df['storage_norm'] = filtered_df['storage'] / filtered_df['storage'].max()
         
         # Calculate weighted score
         filtered_df['value_score'] = (
-            -0.3 * filtered_df['price_norm'] +  # Lower price is better
-            0.3 * filtered_df['rating_norm'] +
-            0.2 * filtered_df['ram_norm'] +
-            0.2 * filtered_df['storage_norm']
+            -0.5 * filtered_df['price_norm'] +  # Lower price is better
+            0.5 * filtered_df['rating_norm']    # Higher rating is better
         )
         
         # Get top recommendations
