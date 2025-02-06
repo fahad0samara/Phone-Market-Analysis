@@ -41,6 +41,8 @@ Thumbs.db
 
 # Project specific
 *.log
-*.csv
 *.sqlite
 *.db
+
+# Allow dataset files
+!mobile_dataset_cleaned.csv
