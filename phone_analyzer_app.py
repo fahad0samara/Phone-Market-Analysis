@@ -294,8 +294,6 @@ with col1:
         },
         hover_data={
             'name': True,
-            'ram': True,
-            'storage': True,
             'bubble_size': False,
             'market_position': ':.2f'
         }
@@ -315,9 +313,7 @@ with col1:
             "Model: %{customdata[1]}",
             "Price: $%{x:,.0f}",
             "Rating: %{y:.2f}⭐",
-            "RAM: %{customdata[2]} GB",
-            "Storage: %{customdata[3]} GB",
-            "Market Position: %{customdata[4]:.2f}"
+            "Market Position: %{customdata[2]:.2f}"
         ])
     )
     
