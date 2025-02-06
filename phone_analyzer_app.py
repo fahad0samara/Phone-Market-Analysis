@@ -1,14 +1,13 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from mobile_phone_ml import MobilePhoneML
-from phone_predictor import PhonePredictor
-import plotly.express as px
-import plotly.graph_objects as go
-from sqlalchemy import create_engine
-import base64
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 from io import BytesIO
 import json
 from datetime import datetime
@@ -19,51 +18,15 @@ recommender = PhoneRecommender()
 
 # Set page configuration
 st.set_page_config(
-    page_title="Mobile Phone Analyzer",
+    page_title="Mobile Phone Market Analyzer",
     page_icon="📱",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# Custom CSS
-st.markdown("""
-    <style>
-    .main {
-        padding: 2rem;
-    }
-    .stButton>button {
-        width: 100%;
-        background-color: #4CAF50;
-        color: white;
-    }
-    .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin: 0.5rem 0;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Initialize predictor
-@st.cache_resource
-def get_predictor():
-    return PhonePredictor()
-
-predictor = get_predictor()
-
-# Database connection
-@st.cache_resource
-def get_engine():
-    return create_engine('sqlite:///database/mobile_phones.db')
-
-engine = get_engine()
-
-# Load database data
 @st.cache_data
 def load_phone_data():
     """Load and preprocess phone data"""
-    df = pd.read_sql('SELECT * FROM mobile_phones', engine)
+    df = pd.read_csv('mobile_dataset_cleaned.csv')
     
     # Convert storage and RAM to numeric values
     df['storage'] = pd.to_numeric(df['storage'].astype(str).str.extract(r'(\d+)')[0], errors='coerce')
@@ -76,27 +39,47 @@ def load_phone_data():
     
     return df
 
-# Helper functions
-def create_download_link(df, filename):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">Download {filename}</a>'
-    return href
+@st.cache_resource
+def get_predictor():
+    """Get or create price predictor"""
+    return PhonePredictor()
 
-def plot_correlation_matrix(df, features):
-    """Create a correlation matrix plot"""
-    # Ensure all feature names exist in the dataframe
-    valid_features = [col for col in features if col in df.columns]
-    if not valid_features:
-        st.error("No valid features found for correlation analysis")
-        return None
+class PhonePredictor:
+    def __init__(self):
+        self.model = None
+        self.scaler = StandardScaler()
+        self.df = load_phone_data()
+        self.train_model()
+    
+    def train_model(self):
+        """Train the price prediction model"""
+        # Prepare features
+        features = ['ram', 'storage', 'ratings']
+        X = self.df[features]
+        y = self.df['price']
         
-    corr = df[valid_features].corr()
-    fig = px.imshow(corr,
-                    labels=dict(color="Correlation"),
-                    title="Feature Correlation Matrix")
-    return fig
+        # Scale features
+        X_scaled = self.scaler.fit_transform(X)
+        
+        # Train model
+        self.model = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.model.fit(X_scaled, y)
+    
+    def predict_price(self, ram, storage, rating):
+        """Predict phone price based on features"""
+        features = [[ram, storage, rating]]
+        features_scaled = self.scaler.transform(features)
+        predicted_price = self.model.predict(features_scaled)[0]
+        return predicted_price
+    
+    def get_feature_importance(self):
+        """Get feature importance scores"""
+        features = ['RAM', 'Storage', 'Rating']
+        importance = self.model.feature_importances_
+        return pd.DataFrame({'Feature': features, 'Importance': importance})
 
+# Initialize predictor
+predictor = get_predictor()
 
 # Sidebar
 st.sidebar.header("Navigation")
