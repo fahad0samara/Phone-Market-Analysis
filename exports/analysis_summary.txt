@@ -1,0 +1,69 @@
+Mobile Phone Market Analysis Summary
+===================================
+
+1. Overall Statistics:
+Total Phones: 4896
+Average Price: ₹16859.43
+Average Rating: 4.31
+Average Storage: 125.0 GB
+Average RAM: 6.3 GB
+
+2. Top 5 Brands by Market Share:
+SAMSUNG: 878 models
+  Average Price: ₹16823.00
+  Average Rating: 4.22
+
+APPLE: 734 models
+  Average Price: ₹17344.52
+  Average Rating: 4.55
+
+REDMI: 656 models
+  Average Price: ₹13916.42
+  Average Rating: 4.28
+
+VIVO: 540 models
+  Average Price: ₹18701.75
+  Average Rating: 4.35
+
+OPPO: 466 models
+  Average Price: ₹20055.32
+  Average Rating: 4.34
+
+3. Price Segment Distribution:
+Premium: 356 phones
+  Average Price: ₹32039.12
+  Average Rating: 4.34
+  Average Storage: 180.9 GB
+  Average RAM: 8.3 GB
+
+High-End: 1238 phones
+  Average Price: ₹24938.38
+  Average Rating: 4.33
+  Average Storage: 167.5 GB
+  Average RAM: 7.9 GB
+
+Mid-Range: 2138 phones
+  Average Price: ₹14780.13
+  Average Rating: 4.30
+  Average Storage: 106.0 GB
+  Average RAM: 5.4 GB
+
+Budget: 1164 phones
+  Average Price: ₹7443.46
+  Average Rating: 4.31
+  Average Storage: 96.7 GB
+  Average RAM: 6.1 GB
+
+4. Top 5 Highest Rated Phones:
+APPLE iPhone 14 Pro Max (Gold, 512 GB): 4.7 stars, ₹26927.0
+APPLE iPhone 14 Pro (Gold, 128 GB): 4.7 stars, ₹10073.0
+APPLE iPhone SE (White, 128 GB): 4.7 stars, ₹32546.0
+APPLE iPhone 5C (Blue, 16 GB): 4.7 stars, ₹23636.0
+APPLE iPhone 14 Pro Max (Gold, 128 GB): 4.7 stars, ₹3073.0
+
+5. Top 5 Best Value Phones:
+APPLE iPhone 13 Pro (Gold, 256 GB): Rating: 4.7, Price: ₹1172.0, Value Score: 40.10
+APPLE iPhone 13 Pro (Graphite, 256 GB): Rating: 4.7, Price: ₹1172.0, Value Score: 40.10
+APPLE iPhone 12 Pro Max (Silver, 256 GB): Rating: 4.7, Price: ₹1172.0, Value Score: 40.10
+APPLE iPhone 13 Pro (Silver, 256 GB): Rating: 4.7, Price: ₹1172.0, Value Score: 40.10
+APPLE iPhone 13 Pro (Gold, 256 GB): Rating: 4.7, Price: ₹1172.0, Value Score: 40.10
