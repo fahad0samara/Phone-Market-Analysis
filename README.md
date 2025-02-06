@@ -42,7 +42,7 @@ A comprehensive data analysis and recommendation tool for mobile phones. This ap
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mobile-phone-analyzer.git
+
 cd mobile-phone-analyzer
 ```
 
@@ -72,7 +72,3 @@ The application uses a cleaned mobile phone dataset containing information about
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
