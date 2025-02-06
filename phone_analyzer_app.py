@@ -35,13 +35,6 @@ def load_phone_data():
     df['price'] = pd.to_numeric(df['price'], errors='coerce')
     df['ratings'] = pd.to_numeric(df['ratings'], errors='coerce')
     
-    # Create price segments
-    df['price_segment'] = pd.qcut(
-        df['price'],
-        q=4,
-        labels=['Budget', 'Mid-Range', 'Premium', 'Ultra Premium']
-    )
-    
     return df
 
 @st.cache_resource
