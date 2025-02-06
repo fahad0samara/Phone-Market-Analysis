@@ -12,6 +12,10 @@ import base64
 from io import BytesIO
 import json
 from datetime import datetime
+from recommendation_engine import PhoneRecommender
+
+# Initialize recommender
+recommender = PhoneRecommender()
 
 # Set page configuration
 st.set_page_config(
@@ -99,7 +103,7 @@ st.sidebar.header("Navigation")
 page = st.sidebar.radio(
     "Choose a page",
     ["Dashboard", "Price Predictor", "Brand Comparison", "Feature Analysis", 
-     "Best Value Finder", "Market Trends", "Performance Analysis", "Custom Analysis"]
+     "Best Value Finder", "Market Trends", "Performance Analysis", "Custom Analysis", "Phone Recommendations"]
 )
 
 if page == "Dashboard":
@@ -1468,6 +1472,165 @@ elif page == "Custom Analysis":
             )
             
             st.plotly_chart(fig)
+
+elif page == "Phone Recommendations":
+    st.title("📱 Smart Phone Recommendations")
+    
+    # Load data
+    df = load_phone_data()
+    
+    # User Preferences Input
+    st.markdown("### 🎯 Your Preferences")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Price Range
+        st.markdown("#### 💰 Budget")
+        min_price = st.number_input("Minimum Price (₹)", 
+                                  min_value=0, 
+                                  max_value=int(df['price'].max()),
+                                  value=10000)
+        max_price = st.number_input("Maximum Price (₹)", 
+                                  min_value=min_price, 
+                                  max_value=int(df['price'].max()),
+                                  value=min_price + 10000)
+        
+        # Brand Preference
+        st.markdown("#### 🏢 Brand Preference")
+        preferred_brands = st.multiselect(
+            "Select preferred brands (optional)",
+            options=sorted(df['brand'].unique()),
+            default=None
+        )
+    
+    with col2:
+        # Features
+        st.markdown("#### ⚙️ Important Features")
+        min_ram = st.slider("Minimum RAM (GB)", 
+                          min_value=1, 
+                          max_value=16, 
+                          value=4)
+        
+        min_storage = st.slider("Minimum Storage (GB)", 
+                              min_value=16, 
+                              max_value=512, 
+                              value=64)
+        
+        min_rating = st.slider("Minimum Rating", 
+                             min_value=1.0, 
+                             max_value=5.0, 
+                             value=4.0,
+                             step=0.1)
+    
+    # Filter phones based on preferences
+    filtered_df = df[
+        (df['price'] >= min_price) &
+        (df['price'] <= max_price) &
+        (df['ram'] >= min_ram) &
+        (df['storage'] >= min_storage) &
+        (df['ratings'] >= min_rating)
+    ]
+    
+    # Apply brand filter if specified
+    if preferred_brands:
+        filtered_df = filtered_df[filtered_df['brand'].isin(preferred_brands)]
+    
+    # Calculate value score
+    filtered_df['price_norm'] = (filtered_df['price'] - filtered_df['price'].mean()) / filtered_df['price'].std()
+    filtered_df['rating_norm'] = (filtered_df['ratings'] - filtered_df['ratings'].mean()) / filtered_df['ratings'].std()
+    filtered_df['ram_norm'] = filtered_df['ram'] / filtered_df['ram'].max()
+    filtered_df['storage_norm'] = filtered_df['storage'] / filtered_df['storage'].max()
+    
+    # Calculate weighted score
+    filtered_df['value_score'] = (
+        -0.3 * filtered_df['price_norm'] +  # Lower price is better
+        0.3 * filtered_df['rating_norm'] +
+        0.2 * filtered_df['ram_norm'] +
+        0.2 * filtered_df['storage_norm']
+    )
+    
+    # Get top recommendations
+    recommendations = filtered_df.nlargest(10, 'value_score')
+    
+    # Display Results
+    st.markdown("### 🎁 Recommended Phones")
+    
+    if len(recommendations) > 0:
+        for idx, row in recommendations.iterrows():
+            with st.expander(f"{row['brand']} {row['name']} - ₹{row['price']:,.0f}"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown(f"**Brand:** {row['brand']}")
+                    st.markdown(f"**Price:** ₹{row['price']:,.0f}")
+                    st.markdown(f"**Rating:** {row['ratings']}⭐")
+                
+                with col2:
+                    st.markdown(f"**RAM:** {row['ram']} GB")
+                    st.markdown(f"**Storage:** {row['storage']} GB")
+                    st.markdown(f"**Value Score:** {row['value_score']:.2f}")
+        
+        # Add Visualization
+        st.markdown("### 📊 Visual Comparison")
+        
+        fig = px.scatter(
+            recommendations,
+            x='price',
+            y='ratings',
+            size='ram',
+            color='brand',
+            hover_name='name',
+            title='Recommended Phones Comparison',
+            labels={
+                'price': 'Price (₹)',
+                'ratings': 'Rating',
+                'ram': 'RAM (GB)'
+            }
+        )
+        
+        fig.update_layout(height=500)
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Add explanation
+        st.markdown("""
+        #### 📝 How to Read the Chart
+        - **Size**: Larger bubbles indicate more RAM
+        - **Position**: Top-left is better (high rating, lower price)
+        - **Color**: Different colors represent different brands
+        """)
+    else:
+        st.warning("No phones found matching your criteria. Try adjusting your preferences.")
+    
+    # Add Visualization
+    if len(recommendations) > 0:
+        st.markdown("### 📊 Visual Comparison")
+        
+        fig = px.scatter(
+            recommendations,
+            x='price',
+            y='ratings',
+            size='ram',
+            color='brand',
+            hover_name='name',
+            title='Recommended Phones Comparison',
+            labels={
+                'price': 'Price (₹)',
+                'ratings': 'Rating',
+                'ram': 'RAM (GB)'
+            }
+        )
+        
+        fig.update_layout(height=500)
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Add explanation
+        st.markdown("""
+        #### 📝 How to Read the Chart
+        - **Size**: Larger bubbles indicate more RAM
+        - **Position**: Top-left is better (high rating, lower price)
+        - **Color**: Different colors represent different brands
+        """)
 
 # Competitive Analysis
 st.markdown("### 🔄 Competitive Analysis")
